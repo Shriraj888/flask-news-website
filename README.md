@@ -506,7 +506,7 @@ SOFTWARE.
 - **[Font Awesome](https://fontawesome.com)** - For the beautiful icon library
 - **[Google Fonts](https://fonts.google.com)** - For the modern typography (Inter & Poppins)
 
----
+--- 
 
 ## 📞 Support
 
