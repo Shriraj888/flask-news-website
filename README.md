@@ -523,17 +523,3 @@ Need help? Here's how to get support:
 - **Email**: your-email@domain.com (for security issues)
 
 ---
-
-<div align="center">
-
-**🌟 Star this repository if you found it helpful!**
-
-**Made with ❤️ using Flask and NewsAPI**
-
-[⬆️ Back to Top](#-flask-news-website)
-
-</div>
-
----
-
-> **⚠️ Important Security Note**: Never commit your `.env` file or API keys to version control. Always use environment variables for sensitive configuration in production.
