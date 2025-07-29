@@ -1,0 +1,219 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1 class="text-gradient mb-4">
+            <i class="fas fa-envelope me-3"></i>Contact Us
+        </h1>
+        <p class="lead mb-5">Get in touch with our news team. We'd love to hear from you!</p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card glassmorphism hover-glow">
+            <div class="card-header">
+                <h4 class="mb-0">
+                    <i class="fas fa-paper-plane me-2"></i>Send us a Message
+                </h4>
+            </div>
+            <div class="card-body">
+                <form id="contactForm" novalidate>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="firstName" class="form-label">
+                                <i class="fas fa-user me-1"></i>First Name *
+                            </label>
+                            <input type="text" class="form-control" id="firstName" name="firstName" required minlength="2">
+                            <div class="valid-feedback">
+                                <i class="fas fa-check me-1"></i>Looks good!
+                            </div>
+                            <div class="invalid-feedback">
+                                <i class="fas fa-exclamation-triangle me-1"></i>Please provide a valid first name (min 2 characters).
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="lastName" class="form-label">
+                                <i class="fas fa-user me-1"></i>Last Name *
+                            </label>
+                            <input type="text" class="form-control" id="lastName" name="lastName" required minlength="2">
+                            <div class="valid-feedback">
+                                <i class="fas fa-check me-1"></i>Looks good!
+                            </div>
+                            <div class="invalid-feedback">
+                                <i class="fas fa-exclamation-triangle me-1"></i>Please provide a valid last name (min 2 characters).
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="email" class="form-label">
+                            <i class="fas fa-at me-1"></i>Email Address *
+                        </label>
+                        <input type="email" class="form-control" id="email" name="email" required>
+                        <div class="valid-feedback">
+                            <i class="fas fa-check me-1"></i>Email format is valid!
+                        </div>
+                        <div class="invalid-feedback">
+                            <i class="fas fa-exclamation-triangle me-1"></i>Please provide a valid email address.
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="phone" class="form-label">
+                            <i class="fas fa-phone me-1"></i>Phone Number (Optional)
+                        </label>
+                        <input type="tel" class="form-control" id="phone" name="phone" pattern="[0-9\-\+\s\(\)]+">
+                        <div class="valid-feedback">
+                            <i class="fas fa-check me-1"></i>Phone number format is valid!
+                        </div>
+                        <div class="invalid-feedback">
+                            <i class="fas fa-exclamation-triangle me-1"></i>Please provide a valid phone number.
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="subject" class="form-label">
+                            <i class="fas fa-tag me-1"></i>Subject *
+                        </label>
+                        <select class="form-select" id="subject" name="subject" required>
+                            <option value="">Choose a subject...</option>
+                            <option value="news-tip">📰 News Tip</option>
+                            <option value="feedback">💬 Feedback</option>
+                            <option value="partnership">🤝 Partnership Inquiry</option>
+                            <option value="press-release">📄 Press Release</option>
+                            <option value="technical">🔧 Technical Issue</option>
+                            <option value="advertising">📢 Advertising</option>
+                            <option value="other">🔍 Other</option>
+                        </select>
+                        <div class="valid-feedback">
+                            <i class="fas fa-check me-1"></i>Subject selected!
+                        </div>
+                        <div class="invalid-feedback">
+                            <i class="fas fa-exclamation-triangle me-1"></i>Please select a subject.
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="message" class="form-label">
+                            <i class="fas fa-comment me-1"></i>Message *
+                        </label>
+                        <textarea class="form-control" id="message" name="message" rows="5" required minlength="10" maxlength="1000" placeholder="Tell us more about your inquiry..."></textarea>
+                        <div class="form-text">
+                            <span id="charCount">0</span>/1000 characters
+                        </div>
+                        <div class="valid-feedback">
+                            <i class="fas fa-check me-1"></i>Message looks good!
+                        </div>
+                        <div class="invalid-feedback">
+                            <i class="fas fa-exclamation-triangle me-1"></i>Please provide a message (10-1000 characters).
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="privacyPolicy" required>
+                            <label class="form-check-label" for="privacyPolicy">
+                                I agree to the <a href="#" class="text-primary">Privacy Policy</a> and <a href="#" class="text-primary">Terms of Service</a> *
+                            </label>
+                            <div class="invalid-feedback">
+                                You must agree to the privacy policy and terms of service.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="fas fa-paper-plane me-2"></i>
+                            <span class="btn-text">Send Message</span>
+                            <span class="spinner-border spinner-border-sm ms-2" role="status" style="display: none;"></span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <div id="responseMessage" class="mt-4" style="display: none;"></div>
+    </div>
+    
+    <div class="col-lg-4">
+        <div class="row">
+            <div class="col-12 mb-4">
+                <div class="card glassmorphism">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-map-marker-alt me-2"></i>Our Office
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <p><strong>Address:</strong><br>
+                        123 News Street<br>
+                        Media City, MC 12345<br>
+                        United States</p>
+                        
+                        <p><strong><i class="fas fa-phone me-1"></i>Phone:</strong><br>
+                        +1 (555) 123-4567</p>
+                        
+                        <p><strong><i class="fas fa-envelope me-1"></i>Email:</strong><br>
+                        info@flasknews.com</p>
+                        
+                        <p><strong><i class="fas fa-clock me-1"></i>Business Hours:</strong><br>
+                        Monday - Friday: 9:00 AM - 6:00 PM<br>
+                        Saturday: 10:00 AM - 4:00 PM<br>
+                        Sunday: Closed</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-12 mb-4">
+                <div class="card glassmorphism">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-newspaper me-2"></i>News Tips
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <p>Have a story tip or breaking news? Contact our newsroom directly:</p>
+                        <p><strong><i class="fas fa-envelope me-1"></i>Newsroom:</strong><br>
+                        newsroom@flasknews.com</p>
+                        <p><strong><i class="fas fa-mobile-alt me-1"></i>Text Tips:</strong><br>
+                        +1 (555) NEWS-TIP</p>
+                        <div class="mt-3">
+                            <small class="text-muted">
+                                <i class="fas fa-shield-alt me-1"></i>
+                                All tips are treated confidentially
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-12">
+                <div class="card glassmorphism">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-share-alt me-2"></i>Follow Us
+                        </h5>
+                    </div>
+                    <div class="card-body text-center">
+                        <a href="#" class="btn btn-outline-primary btn-sm me-2 mb-2">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="#" class="btn btn-outline-primary btn-sm me-2 mb-2">
+                            <i class="fab fa-facebook"></i>
+                        </a>
+                        <a href="#" class="btn btn-outline-primary btn-sm me-2 mb-2">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        <a href="#" class="btn btn-outline-primary btn-sm mb-2">
+                            <i class="fab fa-linkedin"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

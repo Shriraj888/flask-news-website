@@ -1,0 +1,249 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="jumbotron glassmorphism mb-5">
+    <h1 class="display-4">
+        <i class="fas fa-globe-americas me-3"></i>
+        Welcome to <span class="text-gradient">Flask News</span>
+    </h1>
+    <p class="lead">Your go-to source for the latest news and updates from around the world.</p>
+    <hr class="my-4" style="border-color: rgba(255,255,255,0.3);">
+    <p>Stay informed with our comprehensive coverage of current events, delivered with modern technology and elegant design.</p>
+    <div class="d-flex flex-wrap gap-3">
+        <a class="btn btn-primary btn-lg hover-glow" href="{{ url_for('news') }}" role="button">
+            <i class="fas fa-newspaper me-2"></i>Read Latest News
+        </a>
+        <a class="btn btn-outline-primary btn-lg" href="{{ url_for('about') }}" role="button">
+            <i class="fas fa-info-circle me-2"></i>Learn More
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="mb-0">
+                <i class="fas fa-star me-2 text-warning"></i>Featured Stories
+            </h2>
+            <a href="{{ url_for('news') }}" class="btn btn-outline-primary btn-sm">
+                View All News <i class="fas fa-arrow-right ms-1"></i>
+            </a>
+        </div>
+        
+        {% if featured_articles %}
+            {% for article in featured_articles[:2] %}
+            <div class="card mb-4 hover-glow animate-fadeInUp">
+                {% if article.image_url %}
+                <div class="row g-0">
+                    <div class="col-md-4">
+                        <img src="{{ article.image_url }}" class="img-fluid rounded-start h-100" alt="{{ article.title }}" style="object-fit: cover; min-height: 200px;">
+                    </div>
+                    <div class="col-md-8">
+                        <div class="card-body h-100 d-flex flex-column">
+                            <div class="mb-2">
+                                <span class="badge bg-primary">{{ article.source }}</span>
+                            </div>
+                            <h5 class="card-title">{{ article.title }}</h5>
+                            <p class="card-text flex-grow-1">{{ article.content }}</p>
+                            <div class="mt-auto">
+                                <p class="card-text">
+                                    <small class="text-muted">
+                                        <i class="fas fa-clock me-1"></i>{{ article.date }}
+                                    </small>
+                                </p>
+                                {% if article.url and article.url != '#' %}
+                                <a href="{{ article.url }}" target="_blank" class="btn btn-outline-primary btn-sm">
+                                    <i class="fas fa-external-link-alt me-1"></i>Read More
+                                </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% else %}
+                <div class="card-body">
+                    <div class="mb-2">
+                        <span class="badge bg-primary">{{ article.source }}</span>
+                    </div>
+                    <h5 class="card-title">{{ article.title }}</h5>
+                    <p class="card-text">{{ article.content }}</p>
+                    <p class="card-text">
+                        <small class="text-muted">
+                            <i class="fas fa-clock me-1"></i>{{ article.date }}
+                        </small>
+                    </p>
+                    {% if article.url and article.url != '#' %}
+                    <a href="{{ article.url }}" target="_blank" class="btn btn-outline-primary btn-sm">
+                        <i class="fas fa-external-link-alt me-1"></i>Read More
+                    </a>
+                    {% endif %}
+                </div>
+                {% endif %}
+            </div>
+            {% endfor %}
+        {% else %}
+        <div class="card glassmorphism">
+            <div class="card-body text-center py-5">
+                <i class="fas fa-newspaper fa-3x text-muted mb-3"></i>
+                <h5>Loading Featured Stories...</h5>
+                <p class="text-muted">Please wait while we fetch the latest news for you.</p>
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+    
+    <div class="col-lg-4">
+        <div class="row">
+            <!-- Quick Links Card -->
+            <div class="col-12 mb-4">
+                <div class="card glassmorphism hover-glow animate-fadeInRight">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-bolt me-2"></i>Quick Links
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="list-group list-group-flush">
+                            <a href="{{ url_for('news') }}" class="list-group-item list-group-item-action d-flex align-items-center">
+                                <i class="fas fa-newspaper text-primary me-3"></i>
+                                <div>
+                                    <div class="fw-bold">Latest News</div>
+                                    <small class="text-muted">Breaking news and updates</small>
+                                </div>
+                            </a>
+                            <a href="{{ url_for('news', category='technology') }}" class="list-group-item list-group-item-action d-flex align-items-center">
+                                <i class="fas fa-microchip text-info me-3"></i>
+                                <div>
+                                    <div class="fw-bold">Technology</div>
+                                    <small class="text-muted">Tech trends and innovations</small>
+                                </div>
+                            </a>
+                            <a href="{{ url_for('news', category='business') }}" class="list-group-item list-group-item-action d-flex align-items-center">
+                                <i class="fas fa-chart-line text-success me-3"></i>
+                                <div>
+                                    <div class="fw-bold">Business</div>
+                                    <small class="text-muted">Market news and analysis</small>
+                                </div>
+                            </a>
+                            <a href="{{ url_for('contact') }}" class="list-group-item list-group-item-action d-flex align-items-center">
+                                <i class="fas fa-envelope text-warning me-3"></i>
+                                <div>
+                                    <div class="fw-bold">Contact Us</div>
+                                    <small class="text-muted">Get in touch with our team</small>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Categories Card -->
+            <div class="col-12 mb-4">
+                <div class="card glassmorphism hover-glow animate-fadeInRight" style="animation-delay: 0.2s;">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-tags me-2"></i>News Categories
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex flex-wrap gap-2">
+                            <a href="{{ url_for('news', category='general') }}" class="badge bg-primary text-decoration-none">
+                                <i class="fas fa-globe me-1"></i>General
+                            </a>
+                            <a href="{{ url_for('news', category='business') }}" class="badge bg-success text-decoration-none">
+                                <i class="fas fa-briefcase me-1"></i>Business
+                            </a>
+                            <a href="{{ url_for('news', category='technology') }}" class="badge bg-info text-decoration-none">
+                                <i class="fas fa-laptop me-1"></i>Technology
+                            </a>
+                            <a href="{{ url_for('news', category='sports') }}" class="badge bg-warning text-decoration-none">
+                                <i class="fas fa-football-ball me-1"></i>Sports
+                            </a>
+                            <a href="{{ url_for('news', category='entertainment') }}" class="badge bg-danger text-decoration-none">
+                                <i class="fas fa-film me-1"></i>Entertainment
+                            </a>
+                            <a href="{{ url_for('news', category='health') }}" class="badge bg-secondary text-decoration-none">
+                                <i class="fas fa-heartbeat me-1"></i>Health
+                            </a>
+                            <a href="{{ url_for('news', category='science') }}" class="badge bg-dark text-decoration-none">
+                                <i class="fas fa-flask me-1"></i>Science
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Stats Card -->
+            <div class="col-12">
+                <div class="card glassmorphism hover-glow animate-fadeInRight" style="animation-delay: 0.4s;">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-chart-bar me-2"></i>Platform Stats
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row text-center">
+                            <div class="col-6 mb-3">
+                                <div class="h4 text-primary mb-1">
+                                    <i class="fas fa-newspaper"></i>
+                                </div>
+                                <div class="fw-bold">Live News</div>
+                                <small class="text-muted">Real-time updates</small>
+                            </div>
+                            <div class="col-6 mb-3">
+                                <div class="h4 text-success mb-1">
+                                    <i class="fas fa-users"></i>
+                                </div>
+                                <div class="fw-bold">Global Sources</div>
+                                <small class="text-muted">Worldwide coverage</small>
+                            </div>
+                            <div class="col-6">
+                                <div class="h4 text-warning mb-1">
+                                    <i class="fas fa-clock"></i>
+                                </div>
+                                <div class="fw-bold">24/7</div>
+                                <small class="text-muted">Always updated</small>
+                            </div>
+                            <div class="col-6">
+                                <div class="h4 text-info mb-1">
+                                    <i class="fas fa-mobile-alt"></i>
+                                </div>
+                                <div class="fw-bold">Mobile First</div>
+                                <small class="text-muted">Responsive design</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Newsletter Section -->
+<div class="row mt-5">
+    <div class="col-12">
+        <div class="card glassmorphism text-center hover-glow animate-fadeInUp">
+            <div class="card-body py-5">
+                <h3 class="text-gradient mb-3">
+                    <i class="fas fa-bell me-2"></i>Stay Updated
+                </h3>
+                <p class="lead mb-4">Get the latest news delivered directly to your inbox</p>
+                <div class="row justify-content-center">
+                    <div class="col-md-6">
+                        <div class="input-group">
+                            <input type="email" class="form-control" placeholder="Enter your email address">
+                            <button class="btn btn-primary" type="button">
+                                <i class="fas fa-paper-plane me-1"></i>Subscribe
+                            </button>
+                        </div>
+                        <small class="text-muted">We respect your privacy. Unsubscribe at any time.</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

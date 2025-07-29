@@ -1,0 +1,423 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- News Header Section -->
+<div class="news-header">
+    <div class="news-header-content">
+        <div class="news-title-section">
+            <h1 class="news-title">
+                <i class="fas fa-newspaper me-3"></i>
+                Latest News
+            </h1>
+            <p class="news-subtitle">Stay informed with real-time updates from around the world</p>
+            <div class="news-stats">
+                <span class="stat-item">
+                    <i class="fas fa-clock me-1"></i>
+                    Updated every hour
+                </span>
+                <span class="stat-divider">•</span>
+                <span class="stat-item">
+                    <i class="fas fa-globe me-1"></i>
+                    {{ articles|length }} articles available
+                </span>
+            </div>
+        </div>
+        <div class="news-controls">
+            <div class="search-section">
+                <div class="search-wrapper">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" id="searchInput" class="search-input" placeholder="Search news...">
+                    <button class="search-clear" id="searchClear" style="display: none;">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="filter-section">
+                <select class="form-select category-filter" id="categoryFilter" onchange="filterByCategory()">
+                    {% for cat in categories %}
+                    <option value="{{ cat.value }}" {% if cat.value == current_category %}selected{% endif %}>
+                        {{ cat.label }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="view-toggle">
+                <button class="view-btn active" data-view="grid" title="Grid View">
+                    <i class="fas fa-th"></i>
+                </button>
+                <button class="view-btn" data-view="list" title="List View">
+                    <i class="fas fa-list"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- News Grid Container -->
+<div id="newsContainer" class="news-grid" data-view="grid">
+    {% for article in articles %}
+    <article class="news-card" data-aos="fade-up" data-aos-delay="{{ loop.index0 * 100 }}">
+        <div class="news-card-inner">
+            <!-- Image Section -->
+            <div class="news-image-container">
+                {% if article.image_url %}
+                <img src="{{ article.image_url }}" 
+                     class="news-image" 
+                     alt="{{ article.title }}"
+                     loading="lazy"
+                     onerror="this.parentElement.classList.add('no-image')">
+                {% else %}
+                <div class="news-image-placeholder">
+                    <i class="fas fa-image"></i>
+                </div>
+                {% endif %}
+                <div class="news-image-overlay">
+                    <div class="source-badge">{{ article.source }}</div>
+                    <div class="read-time">
+                        <i class="fas fa-clock me-1"></i>
+                        {{ (article.content|length / 200)|round|int }} min read
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Content Section -->
+            <div class="news-content">
+                <div class="news-meta">
+                    <span class="news-category">
+                        <i class="fas fa-tag me-1"></i>
+                        {{ current_category|title }}
+                    </span>
+                    <span class="news-date">
+                        <i class="fas fa-calendar-alt me-1"></i>
+                        {{ article.date }}
+                    </span>
+                </div>
+                
+                <h3 class="news-title-card">{{ article.title }}</h3>
+                
+                <p class="news-excerpt">{{ article.content }}</p>
+                
+                <div class="news-footer">
+                    <div class="author-info">
+                        <div class="author-avatar">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <span class="author-name">{{ article.author or 'Editorial Team' }}</span>
+                    </div>
+                    
+                    {% if article.url and article.url != '#' %}
+                    <a href="{{ article.url }}" 
+                       target="_blank" 
+                       class="read-more-btn"
+                       rel="noopener noreferrer">
+                        <span>Read More</span>
+                        <i class="fas fa-external-link-alt ms-2"></i>
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </article>
+    {% endfor %}
+</div>
+
+<!-- Empty State -->
+{% if not articles %}
+<div class="empty-state">
+    <div class="empty-state-content">
+        <div class="empty-state-icon">
+            <i class="fas fa-newspaper"></i>
+        </div>
+        <h3 class="empty-state-title">No articles available</h3>
+        <p class="empty-state-text">Please try again later or check your internet connection.</p>
+        <button class="btn btn-primary" onclick="location.reload()">
+            <i class="fas fa-refresh me-2"></i>
+            Refresh Page
+        </button>
+    </div>
+</div>
+{% endif %}
+
+<!-- Loading Spinner -->
+<div id="loadingSpinner" class="loading-container" style="display: none;">
+    <div class="loading-content">
+        <div class="loading-spinner">
+            <div class="spinner-ring"></div>
+            <div class="spinner-ring"></div>
+            <div class="spinner-ring"></div>
+        </div>
+        <h3 class="loading-title">Loading latest news...</h3>
+        <p class="loading-text">Fetching the most recent articles for you</p>
+    </div>
+</div>
+
+<!-- Scroll to Top Button -->
+<button id="scrollToTop" class="scroll-to-top" title="Scroll to top">
+    <i class="fas fa-chevron-up"></i>
+</button>
+
+<script>
+// Enhanced News Page JavaScript
+class NewsManager {
+    constructor() {
+        this.currentView = 'grid';
+        this.searchInput = document.getElementById('searchInput');
+        this.searchClear = document.getElementById('searchClear');
+        this.newsContainer = document.getElementById('newsContainer');
+        this.loadingSpinner = document.getElementById('loadingSpinner');
+        this.scrollToTopBtn = document.getElementById('scrollToTop');
+        
+        this.initializeEventListeners();
+        this.initializeScrollToTop();
+        this.initializeIntersectionObserver();
+    }
+    
+    initializeEventListeners() {
+        // Search functionality
+        this.searchInput.addEventListener('input', (e) => this.handleSearch(e.target.value));
+        this.searchClear.addEventListener('click', () => this.clearSearch());
+        
+        // View toggle
+        document.querySelectorAll('.view-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => this.toggleView(e.target.closest('.view-btn').dataset.view));
+        });
+        
+        // Card hover effects
+        this.addCardInteractions();
+    }
+    
+    initializeScrollToTop() {
+        window.addEventListener('scroll', () => {
+            if (window.pageYOffset > 300) {
+                this.scrollToTopBtn.classList.add('visible');
+            } else {
+                this.scrollToTopBtn.classList.remove('visible');
+            }
+        });
+        
+        this.scrollToTopBtn.addEventListener('click', () => {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+    }
+    
+    initializeIntersectionObserver() {
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('animate-in');
+                }
+            });
+        }, {
+            threshold: 0.1,
+            rootMargin: '50px'
+        });
+        
+        document.querySelectorAll('.news-card').forEach(card => {
+            observer.observe(card);
+        });
+    }
+    
+    handleSearch(query) {
+        const cards = document.querySelectorAll('.news-card');
+        
+        if (query.length > 0) {
+            this.searchClear.style.display = 'block';
+        } else {
+            this.searchClear.style.display = 'none';
+        }
+        
+        cards.forEach(card => {
+            const title = card.querySelector('.news-title-card').textContent.toLowerCase();
+            const content = card.querySelector('.news-excerpt').textContent.toLowerCase();
+            const isMatch = title.includes(query.toLowerCase()) || content.includes(query.toLowerCase());
+            
+            card.style.display = isMatch ? 'block' : 'none';
+            if (isMatch) {
+                card.classList.add('search-match');
+            } else {
+                card.classList.remove('search-match');
+            }
+        });
+    }
+    
+    clearSearch() {
+        this.searchInput.value = '';
+        this.searchClear.style.display = 'none';
+        document.querySelectorAll('.news-card').forEach(card => {
+            card.style.display = 'block';
+            card.classList.remove('search-match');
+        });
+    }
+    
+    toggleView(view) {
+        this.currentView = view;
+        this.newsContainer.dataset.view = view;
+        
+        document.querySelectorAll('.view-btn').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.view === view);
+        });
+    }
+    
+    addCardInteractions() {
+        document.querySelectorAll('.news-card').forEach(card => {
+            card.addEventListener('mouseenter', () => {
+                card.classList.add('hovered');
+            });
+            
+            card.addEventListener('mouseleave', () => {
+                card.classList.remove('hovered');
+            });
+        });
+    }
+}
+
+// Category filter function
+function filterByCategory() {
+    const category = document.getElementById('categoryFilter').value;
+    const newsContainer = document.getElementById('newsContainer');
+    const loadingSpinner = document.getElementById('loadingSpinner');
+    
+    // Show loading spinner
+    newsContainer.style.opacity = '0.5';
+    newsContainer.style.pointerEvents = 'none';
+    loadingSpinner.style.display = 'flex';
+    
+    // Update URL without page reload
+    const url = new URL(window.location);
+    url.searchParams.set('category', category);
+    window.history.pushState({}, '', url);
+    
+    // Fetch new articles
+    fetch(`/api/news/${category}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                updateNewsContainer(data.articles);
+            } else {
+                showError('Failed to load news articles');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showError('Failed to load news articles');
+        })
+        .finally(() => {
+            loadingSpinner.style.display = 'none';
+            newsContainer.style.opacity = '1';
+            newsContainer.style.pointerEvents = 'auto';
+        });
+}
+
+function updateNewsContainer(articles) {
+    const container = document.getElementById('newsContainer');
+    
+    if (articles.length === 0) {
+        container.innerHTML = `
+            <div class="empty-state">
+                <div class="empty-state-content">
+                    <div class="empty-state-icon">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <h3 class="empty-state-title">No articles found</h3>
+                    <p class="empty-state-text">No articles found for this category. Try a different category.</p>
+                </div>
+            </div>
+        `;
+        return;
+    }
+    
+    container.innerHTML = articles.map((article, index) => `
+        <article class="news-card" data-aos="fade-up" data-aos-delay="${index * 100}">
+            <div class="news-card-inner">
+                <div class="news-image-container">
+                    ${article.image_url ? 
+                        `<img src="${article.image_url}" 
+                             class="news-image" 
+                             alt="${article.title}"
+                             loading="lazy"
+                             onerror="this.parentElement.classList.add('no-image')">` :
+                        `<div class="news-image-placeholder">
+                            <i class="fas fa-image"></i>
+                         </div>`
+                    }
+                    <div class="news-image-overlay">
+                        <div class="source-badge">${article.source}</div>
+                        <div class="read-time">
+                            <i class="fas fa-clock me-1"></i>
+                            ${Math.round(article.content.length / 200)} min read
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="news-content">
+                    <div class="news-meta">
+                        <span class="news-category">
+                            <i class="fas fa-tag me-1"></i>
+                            ${document.getElementById('categoryFilter').selectedOptions[0].text}
+                        </span>
+                        <span class="news-date">
+                            <i class="fas fa-calendar-alt me-1"></i>
+                            ${article.date}
+                        </span>
+                    </div>
+                    
+                    <h3 class="news-title-card">${article.title}</h3>
+                    
+                    <p class="news-excerpt">${article.content}</p>
+                    
+                    <div class="news-footer">
+                        <div class="author-info">
+                            <div class="author-avatar">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <span class="author-name">${article.author || 'Editorial Team'}</span>
+                        </div>
+                        
+                        ${article.url && article.url !== '#' ? 
+                            `<a href="${article.url}" 
+                               target="_blank" 
+                               class="read-more-btn"
+                               rel="noopener noreferrer">
+                                <span>Read More</span>
+                                <i class="fas fa-external-link-alt ms-2"></i>
+                            </a>` : ''
+                        }
+                    </div>
+                </div>
+            </div>
+        </article>
+    `).join('');
+    
+    // Reinitialize interactions for new cards
+    window.newsManager.addCardInteractions();
+    window.newsManager.initializeIntersectionObserver();
+}
+
+function showError(message) {
+    const container = document.getElementById('newsContainer');
+    container.innerHTML = `
+        <div class="empty-state">
+            <div class="empty-state-content">
+                <div class="empty-state-icon error">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <h3 class="empty-state-title">Error Loading News</h3>
+                <p class="empty-state-text">${message}</p>
+                <button class="btn btn-primary" onclick="location.reload()">
+                    <i class="fas fa-refresh me-2"></i>
+                    Try Again
+                </button>
+            </div>
+        </div>
+    `;
+}
+
+// Initialize when DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+    window.newsManager = new NewsManager();
+});
+</script>
+{% endblock %}
