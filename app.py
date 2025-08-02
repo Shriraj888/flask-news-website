@@ -1,10 +1,9 @@
 from flask import Flask, render_template, request, jsonify
 import os
-import requests
-from datetime import datetime
 import re
-from dotenv import load_dotenv
+from datetime import datetime, timedelta
 import secrets
+from dotenv import load_dotenv
 
 # Load environment variables from .env file
 load_dotenv()
@@ -25,103 +24,145 @@ def after_request(response):
     response.headers['Strict-Transport-Security'] = 'max-age=31536000; includeSubDomains'
     return response
 
-# News API configuration
-NEWS_API_KEY = os.environ.get('NEWS_API_KEY')
-NEWS_API_BASE_URL = 'https://newsapi.org/v2'
-
-# Validate API key
-if not NEWS_API_KEY:
-    print("WARNING: NEWS_API_KEY environment variable not set!")
-    print("Please set your NewsAPI key in the .env file or environment variables.")
-
-# Cache for API responses (simple in-memory cache)
-NEWS_CACHE = {}
-CACHE_DURATION = 300  # 5 minutes
+# Mock news data for demonstration (no API required)
+MOCK_NEWS_DATA = {
+    'general': [
+        {
+            'title': 'Breaking: Revolutionary AI Technology Transforms Healthcare',
+            'content': 'Scientists have developed groundbreaking artificial intelligence that can diagnose diseases with unprecedented accuracy, potentially revolutionizing medical care worldwide.',
+            'author': 'Dr. Sarah Johnson',
+            'date': 'December 15, 2024 at 10:30 AM',
+            'url': '#',
+            'image_url': 'https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=800&h=400&fit=crop',
+            'source': 'Tech Medical Journal'
+        },
+        {
+            'title': 'Global Climate Summit Reaches Historic Agreement',
+            'content': 'World leaders unite on ambitious new climate targets, promising unprecedented cooperation to combat global warming and protect the environment.',
+            'author': 'Environmental Correspondent',
+            'date': 'December 14, 2024 at 2:15 PM',
+            'url': '#',
+            'image_url': 'https://images.unsplash.com/photo-1569163139394-de44aa2aa3f5?w=800&h=400&fit=crop',
+            'source': 'Global News Network'
+        },
+        {
+            'title': 'Space Exploration Milestone: Mars Colony Planning Begins',
+            'content': 'International space agencies announce detailed plans for the first permanent human settlement on Mars, marking a new era in space exploration.',
+            'author': 'Space Reporter',
+            'date': 'December 13, 2024 at 6:45 PM',
+            'url': '#',
+            'image_url': 'https://images.unsplash.com/photo-1446776876964-6cf67f04d350?w=800&h=400&fit=crop',
+            'source': 'Space Today'
+        }
+    ],
+    'technology': [
+        {
+            'title': 'Quantum Computing Breakthrough Achieved',
+            'content': 'Researchers successfully demonstrate quantum advantage in practical applications, bringing quantum computing closer to everyday use.',
+            'author': 'Tech Editor',
+            'date': 'December 15, 2024 at 9:00 AM',
+            'url': '#',
+            'image_url': 'https://images.unsplash.com/photo-1518709268805-4e9042af2176?w=800&h=400&fit=crop',
+            'source': 'Quantum Weekly'
+        },
+        {
+            'title': 'New Programming Language Revolutionizes Development',
+            'content': 'A new programming language promises to make software development faster, safer, and more accessible to developers worldwide.',
+            'author': 'Code Analyst',
+            'date': 'December 14, 2024 at 11:30 AM',
+            'url': '#',
+            'image_url': 'https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=800&h=400&fit=crop',
+            'source': 'Developer News'
+        }
+    ],
+    'business': [
+        {
+            'title': 'Sustainable Energy Investments Reach Record High',
+            'content': 'Global investments in renewable energy technologies hit unprecedented levels, signaling a major shift towards sustainable business practices.',
+            'author': 'Business Analyst',
+            'date': 'December 15, 2024 at 8:15 AM',
+            'url': '#',
+            'image_url': 'https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?w=800&h=400&fit=crop',
+            'source': 'Business Today'
+        }
+    ],
+    'sports': [
+        {
+            'title': 'World Cup Preparations Underway',
+            'content': 'Teams from around the globe are making final preparations for the upcoming World Cup, promising an exciting tournament ahead.',
+            'author': 'Sports Reporter',
+            'date': 'December 15, 2024 at 7:30 AM',
+            'url': '#',
+            'image_url': 'https://images.unsplash.com/photo-1431324155629-1a6deb1dec8d?w=800&h=400&fit=crop',
+            'source': 'Sports Central'
+        }
+    ],
+    'health': [
+        {
+            'title': 'New Treatment Shows Promise for Rare Diseases',
+            'content': 'Medical researchers announce breakthrough treatment that could help millions of patients suffering from rare genetic disorders.',
+            'author': 'Medical Correspondent',
+            'date': 'December 14, 2024 at 3:20 PM',
+            'url': '#',
+            'image_url': 'https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=800&h=400&fit=crop',
+            'source': 'Health Science Daily'
+        }
+    ],
+    'science': [
+        {
+            'title': 'Ocean Exploration Reveals New Species',
+            'content': 'Deep-sea exploration mission discovers dozens of new marine species, expanding our understanding of ocean biodiversity.',
+            'author': 'Marine Biologist',
+            'date': 'December 13, 2024 at 4:45 PM',
+            'url': '#',
+            'image_url': 'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=800&h=400&fit=crop',
+            'source': 'Ocean Research Institute'
+        }
+    ],
+    'entertainment': [
+        {
+            'title': 'Award Season Kicks Off with Surprise Nominations',
+            'content': 'This year\'s entertainment awards feature unexpected nominees, showcasing diverse talent from around the world.',
+            'author': 'Entertainment Reporter',
+            'date': 'December 12, 2024 at 5:00 PM',
+            'url': '#',
+            'image_url': 'https://images.unsplash.com/photo-1489599162718-d8d60bc20cdf?w=800&h=400&fit=crop',
+            'source': 'Entertainment Weekly'
+        }
+    ]
+}
 
 def fetch_news(category='general', country='us', page_size=10):
     """
-    Fetch news articles from News API with caching
+    Fetch mock news articles for demonstration
     
     Args:
         category (str): News category
-        country (str): Country code
+        country (str): Country code (ignored in mock version)
         page_size (int): Number of articles to fetch
     
     Returns:
-        list: List of processed news articles
+        list: List of mock news articles
     """
-    # Check if API key is available
-    if not NEWS_API_KEY:
-        print("NEWS_API_KEY not found. Please set it in your .env file.")
-        return []
+    # Get articles for the requested category, fallback to general
+    articles = MOCK_NEWS_DATA.get(category, MOCK_NEWS_DATA['general']).copy()
     
-    # Create cache key
-    cache_key = f"{category}_{country}_{page_size}"
-    current_time = datetime.now().timestamp()
+    # If we need more articles, add some from other categories
+    if len(articles) < page_size:
+        for cat_name, cat_articles in MOCK_NEWS_DATA.items():
+            if cat_name != category:
+                articles.extend(cat_articles)
+                if len(articles) >= page_size:
+                    break
     
-    # Check cache first
-    if cache_key in NEWS_CACHE:
-        cached_data, timestamp = NEWS_CACHE[cache_key]
-        if current_time - timestamp < CACHE_DURATION:
-            return cached_data
-    
-    try:
-        url = f"{NEWS_API_BASE_URL}/top-headlines"
-        params = {
-            'apiKey': NEWS_API_KEY,
-            'category': category,
-            'country': country,
-            'pageSize': min(page_size, 20)  # Limit to 20 articles max
-        }
-        
-        response = requests.get(url, params=params, timeout=10)
-        response.raise_for_status()
-        
-        data = response.json()
-        
-        if data.get('status') == 'ok':
-            articles = []
-            for article in data.get('articles', []):
-                # Skip articles with removed content
-                if article.get('title') == '[Removed]' or not article.get('title'):
-                    continue
-                    
-                processed_article = {
-                    'title': article.get('title', 'No Title'),
-                    'content': article.get('description', 'No description available.'),
-                    'author': article.get('author', 'Unknown Author'),
-                    'date': format_date(article.get('publishedAt')),
-                    'url': article.get('url', '#'),
-                    'image_url': article.get('urlToImage'),
-                    'source': article.get('source', {}).get('name', 'Unknown Source')
-                }
-                articles.append(processed_article)
-            
-            # Cache the results
-            NEWS_CACHE[cache_key] = (articles, current_time)
-            
-            return articles
-        else:
-            print(f"API Error: {data.get('message', 'Unknown error')}")
-            return []
-            
-    except requests.exceptions.RequestException as e:
-        print(f"Request Error: {e}")
-        return []
-    except Exception as e:
-        print(f"General Error: {e}")
-        return []
+    # Limit to requested page size
+    return articles[:page_size]
 
 def format_date(date_string):
-    """Format ISO date string to readable format"""
+    """Format date string to readable format"""
     if not date_string:
         return 'Unknown Date'
-    
-    try:
-        dt = datetime.fromisoformat(date_string.replace('Z', '+00:00'))
-        return dt.strftime('%B %d, %Y at %I:%M %p')
-    except:
-        return date_string
+    return date_string
 
 # Routes
 @app.route('/')
@@ -138,12 +179,11 @@ def about():
 
 @app.route('/news')
 def news():
-    """News page route - fetches news from API"""
+    """News page route - displays mock news articles"""
     category = request.args.get('category', 'general')
-    country = request.args.get('country', 'us')
     
-    # Fetch news articles from API
-    news_articles = fetch_news(category=category, country=country, page_size=12)
+    # Fetch news articles
+    news_articles = fetch_news(category=category, page_size=12)
     
     # Available categories for the filter
     categories = [
@@ -165,10 +205,9 @@ def news():
 @app.route('/api/news/<category>')
 def api_news(category):
     """API endpoint for fetching news by category"""
-    country = request.args.get('country', 'us')
-    page_size = min(int(request.args.get('page_size', 10)), 20)  # Limit to 20 articles max
+    page_size = min(int(request.args.get('page_size', 10)), 20)
     
-    articles = fetch_news(category=category, country=country, page_size=page_size)
+    articles = fetch_news(category=category, page_size=page_size)
     
     return jsonify({
         'status': 'success',

@@ -3,13 +3,17 @@
 <div align="center">
 
 ![Flask News Website](https://img.shields.io/badge/Flask-News%20Website-blue?style=for-the-badge&logo=flask)
-![Status](https://img.shields.io/badge/Status-Production%20Ready-brightgreen?style=for-the-badge)
+![Status](https://img.shields.io/badge/Status-Demo%20Ready-brightgreen?style=for-the-badge)
 ![Python](https://img.shields.io/badge/Python-3.7+-blue?style=for-the-badge&logo=python)
 ![License](https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge)
 
-**A modern, responsive news website built with Flask and powered by NewsAPI**
+**A modern, responsive news website built with Flask - Works with demo data or real NewsAPI**
 
-[[📖 Documentation](#documentation) • [🛠️ Installation](#installation) • [🤝 Contributing](#contributing)
+> ✨ **Ready to use immediately** - No API keys required for demo mode!  
+> 🔧 **Production ready** - Easy upgrade to live NewsAPI integration  
+> 🎯 **Perfect for learning** - Clean code, comprehensive documentation
+
+[🚀 Quick Start](#installation) • [📖 Documentation](#project-structure) • [🛠️ Features](#features) • [� Live API Setup](#upgrade-to-live-news-optional) • [🤝 Contributing](#contributing)
 
 </div>
 
@@ -26,12 +30,12 @@
 *Responsive news grid with category filtering and real-time search*
 
 ### 🔍 Search & Filter Features
-![Search and Filter]()
+![Search and Filter](/screenshots/search.png)
 *Real-time search functionality with category-based filtering*
 
-### About us 
+### 📱 About Us Page
 <div align="center">
-<img src="/screenshots/about.png" width="300" alt="Mobile View">
+<img src="/screenshots/about.png" width="300" alt="About Page">
 </div>
 
 *Fully responsive design optimized for all device sizes*
@@ -52,36 +56,40 @@
 - 🌈 **Interactive UI** - Modern card design with hover states
 
 ### 📰 **News Features**
-- 📡 **Live News Feed** - Real-time news from NewsAPI
+- 📡 **Demo News Feed** - Sample articles included for instant demo
+- 🌐 **Live News Option** - Easy integration with NewsAPI for real data
 - 🎯 **Category Filtering** - Browse by Business, Technology, Sports, etc.
-- 🔄 **Auto-refresh** - News updates every 5 minutes with caching
-- 📖 **Read More** - Direct links to full articles
+- 🔄 **Responsive Design** - Optimized for all device sizes
+- 📖 **Read More** - Interactive article cards with external links
 - 🏷️ **Source Attribution** - Clear source and author information
+- 🔍 **Search Functionality** - Find articles by title or content
 
 ### ⚡ **Performance**
 - 🚀 **Fast Loading** - Optimized images with lazy loading
-- 💾 **Smart Caching** - 5-minute API response cache
+- 💾 **Lightweight** - No external API dependencies
 - 🎯 **SEO Friendly** - Clean URLs and meta tags
 - 📱 **PWA Ready** - Progressive Web App capabilities
 
 ### 🛡️ **Security**
-- 🔐 **Environment Variables** - Secure API key management
+- 🔐 **Environment Variables** - Secure configuration management
 - 🛡️ **Input Validation** - XSS and injection protection
 - 🔒 **Security Headers** - HSTS, XSS Protection, Content Security
-- 🚫 **Rate Limiting** - API call optimization and limits
+- 🚫 **Safe Demo Mode** - No API keys required for demo
+- ✅ **Production Ready** - Easy switch to live data
 
 ---
 
 ## 🛠️ Installation
 
 ### Prerequisites
-- **Python 3.7+** 
+- **Python 3.7+**
+- **NewsAPI Key** (optional) - Free from [newsapi.org](https://newsapi.org) for live news
 
-### Quick Start
+### Quick Start (Demo Mode)
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/yourusername/flask-news-website.git
+   git clone https://github.com/Shriraj888/flask-news-website.git
    cd flask-news-website
    ```
 
@@ -101,35 +109,82 @@
    pip install -r requirements.txt
    ```
 
-4. **Environment Setup**
+4. **Run the application**
    ```bash
-   # Copy environment template
-   cp .env.example .env
+   python app.py
    ```
    
-   **Edit `.env` file and add your API key:**
-   ```env
-   NEWS_API_KEY=your-newsapi-key-here
-   SECRET_KEY=your-secret-key-here
-   FLASK_DEBUG=False
+   🎉 Visit `http://localhost:5000` to see your website with demo data!
+
+### 🔧 No Setup Required
+This version includes demo news data and requires no external API keys or configuration!
+
+## 🔑 Upgrade to Live News (Optional)
+
+### For Real-Time News Updates
+
+If you want to fetch live news data instead of using demo content, follow these steps:
+
+1. **Get a free NewsAPI key**
+   - Visit [newsapi.org](https://newsapi.org/register)
+   - Create a free account (70,000 requests/month free)
+   - Copy your API key
+
+2. **Create environment file**
+   ```bash
+   # Create .env file in project root
+   echo "NEWS_API_KEY=YOUR_ACTUAL_API_KEY_HERE" > .env
    ```
 
-5. **Get Your API Key**
-   - Visit [NewsAPI.org](https://newsapi.org)
-   - Register for a free account (Developer plan)
-   - Copy your API key from the dashboard
-   - Add it to your `.env` file
+3. **Update your app.py**
+   Replace the demo data function with live API calls:
+   ```python
+   import requests
+   import os
+   from dotenv import load_dotenv
+   
+   load_dotenv()
+   API_KEY = os.getenv('NEWS_API_KEY')
+   
+   def get_news_articles(category='general', query=None):
+       if not API_KEY:
+           return get_sample_articles()  # Fallback to demo data
+       
+       url = 'https://newsapi.org/v2/top-headlines'
+       params = {
+           'apiKey': API_KEY,
+           'country': 'us',
+           'pageSize': 20
+       }
+       
+       if category and category != 'all':
+           params['category'] = category
+       if query:
+           params['q'] = query
+           
+       try:
+           response = requests.get(url, params=params)
+           response.raise_for_status()
+           return response.json().get('articles', [])
+       except requests.RequestException:
+           return get_sample_articles()  # Fallback to demo on error
+   ```
 
-6. **Run the application**
+4. **Install additional dependency**
+   ```bash
+   pip install requests python-dotenv
+   ```
+
+5. **Restart your application**
    ```bash
    python app.py
    ```
 
-### 🔧 Verification
-Run the built-in verification script to ensure everything is set up correctly:
-```bash
-python verify_deployment.py
-```
+### ⚠️ Important Security Notes
+- **Never commit your API key to version control**
+- Keep your `.env` file private and add it to `.gitignore`
+- Use environment variables in production deployments
+- The app automatically falls back to demo data if API calls fail
 
 ---
 
@@ -190,7 +245,6 @@ gunicorn -c gunicorn.conf.py app:app
 ### Environment Variables for Production
 
 ```bash
-export NEWS_API_KEY="your-newsapi-key"
 export SECRET_KEY="your-super-secret-key"
 export FLASK_ENV="production"
 export FLASK_DEBUG="False"
@@ -216,18 +270,18 @@ CMD ["gunicorn", "-c", "gunicorn.conf.py", "app:app"]
 Build and run:
 ```bash
 docker build -t flask-news-website .
-docker run -p 5000:5000 --env-file .env flask-news-website
+docker run -p 5000:5000 flask-news-website
 ```
 
 ### Cloud Deployment Options
 
 | Platform | Configuration | Notes |
 |----------|---------------|-------|
-| **Heroku** | `Procfile`: `web: gunicorn app:app` | Add Config Vars for environment variables |
-| **Railway** | Auto-deploy from Git | Set environment variables in dashboard |
-| **DigitalOcean App Platform** | App spec configuration | Environment variables in app settings |
-| **AWS Elastic Beanstalk** | `.ebextensions` folder | Use environment configuration |
-| **Google Cloud Run** | Cloud Build configuration | Set env vars in service settings |
+| **Heroku** | `Procfile`: `web: gunicorn app:app` | Simple git-based deployment |
+| **Railway** | Auto-deploy from Git | Automatic deployments from GitHub |
+| **DigitalOcean App Platform** | App spec configuration | Container-based deployment |
+| **Vercel** | `vercel.json` configuration | Serverless deployment |
+| **Netlify** | Build configuration | Static site hosting |
 
 ---
 
@@ -237,8 +291,7 @@ docker run -p 5000:5000 --env-file .env flask-news-website
 - **Flask 2.3.3** - Lightweight WSGI web application framework
 - **Python 3.7+** - Programming language
 - **Gunicorn** - WSGI HTTP Server for UNIX
-- **python-dotenv** - Environment variable management
-- **Requests** - HTTP library for API calls
+- **Jinja2** - Template engine for Python
 
 ### Frontend
 - **HTML5** - Semantic markup
@@ -249,8 +302,9 @@ docker run -p 5000:5000 --env-file .env flask-news-website
 - **Google Fonts** - Inter & Poppins typography
 
 ### APIs & Services
-- **NewsAPI** - Real-time news data
-- **RESTful API Design** - Clean API endpoints
+- **Demo Data** - Self-contained sample news articles
+- **Responsive Design** - Mobile-first approach
+- **Modern UI/UX** - Dark theme with glassmorphism effects
 
 ---
 
@@ -417,33 +471,23 @@ We welcome contributions! Here's how to get started:
 ### Common Issues
 
 <details>
-<summary><strong>🔑 "NEWS_API_KEY not found" error</strong></summary>
-
-**Solution:**
-1. Make sure you've created a `.env` file: `cp .env.example .env`
-2. Edit `.env` and add your API key: `NEWS_API_KEY=your-actual-key`
-3. Verify the API key is valid at [newsapi.org](https://newsapi.org)
-4. Restart the application
-</details>
-
-<details>
-<summary><strong>📰 No news articles showing</strong></summary>
-
-**Solution:**
-1. Check your internet connection
-2. Verify API key hasn't exceeded rate limits (Developer: 1000 requests/day)
-3. Check browser console for JavaScript errors
-4. Test API key with curl: `curl "https://newsapi.org/v2/top-headlines?country=us&apiKey=YOUR_KEY"`
-</details>
-
-<details>
-<summary><strong>🚀 App won't start</strong></summary>
+<summary><strong>� App won't start</strong></summary>
 
 **Solution:**
 1. Ensure Python 3.7+ is installed: `python --version`
 2. Install dependencies: `pip install -r requirements.txt`
 3. Verify you're in the correct directory
 4. Check for port conflicts (default: 5000)
+</details>
+
+<details>
+<summary><strong>📰 No articles showing</strong></summary>
+
+**Solution:**
+1. Check if the Flask app is running properly
+2. Verify there are no JavaScript errors in browser console
+3. Clear browser cache and reload
+4. Check that demo data is loading correctly
 </details>
 
 <details>
@@ -459,8 +503,33 @@ We welcome contributions! Here's how to get started:
 ### Debug Mode
 For development debugging:
 ```bash
+# Windows
+set FLASK_DEBUG=True
+python app.py
+
+# Linux/Mac  
 export FLASK_DEBUG=True
 python app.py
+```
+
+### Additional Troubleshooting
+
+#### Demo Mode Specific Issues
+- **Website won't load**: Check if Flask is running on port 5000
+- **Styling broken**: Ensure Bootstrap CDN is accessible  
+- **Search not working**: Demo search filters local demo articles only
+- **Images not loading**: Demo uses Unsplash, check internet connection
+
+#### Live API Mode Specific Issues  
+- **No news loading**: Verify your NewsAPI key is correct in `.env`
+- **API errors**: Check your API usage limits (70,000 requests/month free)
+- **SSL errors**: Ensure your environment supports HTTPS requests
+- **Rate limiting**: NewsAPI has request limits, app falls back to demo data
+
+#### Environment Variable Testing
+```bash
+# Check if .env is loaded correctly (when using live API)
+python -c "import os; from dotenv import load_dotenv; load_dotenv(); print('API Key loaded:', bool(os.getenv('NEWS_API_KEY')))"
 ```
 
 ---
@@ -497,7 +566,6 @@ SOFTWARE.
 
 ## 🙏 Acknowledgments
 
-- **[NewsAPI](https://newsapi.org)** - For providing comprehensive news data
 - **[Flask](https://flask.palletsprojects.com/)** - For the lightweight and flexible web framework
 - **[Bootstrap](https://getbootstrap.com)** - For the responsive CSS framework
 - **[Font Awesome](https://fontawesome.com)** - For the beautiful icon library

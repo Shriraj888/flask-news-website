@@ -35,16 +35,10 @@ fi
 # Run production checks
 echo "✅ Running production checks..."
 
-# Check if NEWS_API_KEY is set
-if [ -z "$NEWS_API_KEY" ]; then
-    echo "⚠️  WARNING: NEWS_API_KEY environment variable not set!"
-    echo "   Please set it in your .env file or environment"
-fi
-
 # Check if SECRET_KEY is set
 if [ -z "$SECRET_KEY" ]; then
     echo "⚠️  WARNING: SECRET_KEY environment variable not set!"
-    echo "   Please set it in your .env file or environment"
+    echo "   A random secret key will be generated automatically"
 fi
 
 # Generate a random secret key if not provided
@@ -58,7 +52,7 @@ echo ""
 echo "🎉 Deployment preparation complete!"
 echo ""
 echo "📋 Next steps:"
-echo "   1. Configure your .env file with API keys"
+echo "   1. Configure your .env file if needed"
 echo "   2. Set up a reverse proxy (nginx) if needed"
 echo "   3. Configure SSL certificates"
 echo "   4. Start the application with: gunicorn -c gunicorn.conf.py app:app"
