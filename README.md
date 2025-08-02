@@ -562,15 +562,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
 
----
-
-## 🙏 Acknowledgments
-
-- **[Flask](https://flask.palletsprojects.com/)** - For the lightweight and flexible web framework
-- **[Bootstrap](https://getbootstrap.com)** - For the responsive CSS framework
-- **[Font Awesome](https://fontawesome.com)** - For the beautiful icon library
-- **[Google Fonts](https://fonts.google.com)** - For the modern typography (Inter & Poppins)
-
 --- 
 
 ## 📞 Support
@@ -582,9 +573,5 @@ Need help? Here's how to get support:
 3. **💬 Ask Questions** - Open a new issue with the "question" label
 4. **🐛 Report Bugs** - Open an issue with the "bug" label
 5. **💡 Request Features** - Open an issue with the "enhancement" label
-
-### Contact Information
-- **GitHub Issues**: [Open an issue](https://github.com/yourusername/flask-news-website/issues)
-- **Email**: your-email@domain.com (for security issues)
 
 ---
