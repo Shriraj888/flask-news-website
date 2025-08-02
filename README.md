@@ -9,7 +9,7 @@
 
 **A modern, responsive news website built with Flask and powered by NewsAPI**
 
-[🚀 Live Demo](#demo) • [📖 Documentation](#documentation) • [🛠️ Installation](#installation) • [🤝 Contributing](#contributing)
+[[📖 Documentation](#documentation) • [🛠️ Installation](#installation) • [🤝 Contributing](#contributing)
 
 </div>
 
@@ -18,26 +18,26 @@
 ## 📱 Screenshots
 
 ### 🏠 Homepage - Modern Dark Theme
-![Homepage](screenshots/homepage.png)
+![Homepage](/screenshots/home.png)
 *Clean, modern homepage with featured news articles and smooth animations*
 
 ### 📰 News Feed - Responsive Grid Layout
-![News Feed](screenshots/news-feed.png)
+![News Feed](/screenshots/articles.png)
 *Responsive news grid with category filtering and real-time search*
 
 ### 🔍 Search & Filter Features
-![Search and Filter](screenshots/search-filter.png)
+![Search and Filter]()
 *Real-time search functionality with category-based filtering*
 
-### 📱 Mobile Responsive Design
+### About us 
 <div align="center">
-<img src="screenshots/mobile-view.png" width="300" alt="Mobile View">
+<img src="/screenshots/about.png" width="300" alt="Mobile View">
 </div>
 
 *Fully responsive design optimized for all device sizes*
 
 ### 📧 Contact Form with Validation
-![Contact Form](screenshots/contact-form.png)
+![Contact Form](/screenshots/contact.png)
 *Enhanced contact form with real-time validation and smooth animations*
 
 ---
@@ -76,7 +76,6 @@
 
 ### Prerequisites
 - **Python 3.7+** 
-- **News API Key** - Free from [newsapi.org](https://newsapi.org)
 
 ### Quick Start
 
@@ -125,8 +124,6 @@
    ```bash
    python app.py
    ```
-   
-   🎉 Visit `http://localhost:5000` to see your website!
 
 ### 🔧 Verification
 Run the built-in verification script to ensure everything is set up correctly:
