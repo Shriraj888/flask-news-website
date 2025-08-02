@@ -35,7 +35,7 @@ echo.
 echo 🎉 Deployment preparation complete!
 echo.
 echo 📋 Next steps:
-echo    1. Configure your .env file with API keys
+echo    1. Configure your .env file if needed
 echo    2. Set up a reverse proxy (nginx) if needed  
 echo    3. Configure SSL certificates
 echo    4. Start the application with: gunicorn -c gunicorn.conf.py app:app

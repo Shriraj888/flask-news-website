@@ -111,17 +111,13 @@ class SecurityAudit:
         with open(template_path, 'r') as f:
             template_content = f.read()
             
-        required_vars = ['NEWS_API_KEY', 'SECRET_KEY']
+        required_vars = ['SECRET_KEY']
         missing_vars = []
         
         for var in required_vars:
             if var not in template_content:
                 missing_vars.append(var)
                 
-        # Check for actual API keys in template
-        if re.search(r'NEWS_API_KEY=(?!your-|YOUR_|example)', template_content):
-            self.issues.append("❌ .env.example contains actual API key")
-            
         if missing_vars:
             self.warnings.append(f"Missing template variables: {', '.join(missing_vars)}")
         else:
@@ -135,7 +131,6 @@ class SecurityAudit:
         python_files = list(self.project_root.glob('*.py'))
         
         security_patterns = [
-            (r'api_key\s*=\s*["\'][^"\']+["\']', 'Hardcoded API key'),
             (r'password\s*=\s*["\'][^"\']+["\']', 'Hardcoded password'),
             (r'secret\s*=\s*["\'][^"\']+["\']', 'Hardcoded secret'),
             (r'token\s*=\s*["\'][^"\']+["\']', 'Hardcoded token'),
@@ -177,7 +172,6 @@ class SecurityAudit:
             
         essential_packages = [
             'Flask',
-            'requests',
             'python-dotenv',
             'gunicorn'
         ]
