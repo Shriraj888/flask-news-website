@@ -1,5 +1,5 @@
 # 🌟 Flask News Website
-
+ 
 <div align="center">
 
 ![Flask News Website](https://img.shields.io/badge/Flask-News%20Website-blue?style=for-the-badge&logo=flask)
